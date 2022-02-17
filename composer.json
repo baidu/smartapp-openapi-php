@@ -1,0 +1,13 @@
+{
+    "name": "baidu/smartapp-openapi-php",
+    "description": "smartapp-openapi-php",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "baidu",
+            "email": ""
+        }
+    ],
+    "require": {}
+}
