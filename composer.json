@@ -1,12 +1,16 @@
 {
     "name": "baidu-smartapp/openapi",
-    "description": "smartapp-openapi",
     "type": "library",
     "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "BaiduSmartapp\\Openapi\\": "src/"
+        }
+    },
     "authors": [
         {
             "name": "baidu",
-            "email": "guoqinguo@baidu.com"
+            "email": "msfruit@hotmail.com"
         }
     ],
     "require": {}
