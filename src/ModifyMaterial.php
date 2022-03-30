@@ -4,7 +4,6 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class ModifyMaterialRequest {
     public $accessToken; // string 接口调用凭证
     public $appId; // int64 app_id
@@ -21,24 +20,6 @@ class ModifyMaterialRequest {
     public $bigImage; // string 封面图片链接（1 张，单图片最大 2M）大图模板要求最小尺寸 1068 x 601，比例为 16：9，单图最大为 2M
     public $verticalImage; // string 当选择小说/动漫，影视剧，电影票务，演出赛事时必填；（竖图 3：4）最低 213*284
     public $extJson; // string 扩展信息
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->appId = 0;
-        $this->id = 0;
-        $this->imageUrl = "";
-        $this->title = "";
-        $this->path = "";
-        $this->category1Code = "";
-        $this->category2Code = "";
-        $this->desc = "";
-        $this->labelAttr = "";
-        $this->labelDiscount = "";
-        $this->buttonName = "";
-        $this->bigImage = "";
-        $this->verticalImage = "";
-        $this->extJson = "";
-    }
 }
 
 /**
@@ -47,6 +28,7 @@ class ModifyMaterialRequest {
 class ModifyMaterial{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -58,40 +40,40 @@ class ModifyMaterial{
         $client->setPath("/rest/2.0/smartapp/articlemount/material/modify");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addPostParam("app_id",  $params->appId);
-        $client->addPostParam("id",  $params->id);
-        $client->addPostParam("imageUrl",  $params->imageUrl);
-        $client->addPostParam("title",  $params->title);
-        $client->addPostParam("path",  $params->path);
-        $client->addPostParam("category1Code",  $params->category1Code);
-        $client->addPostParam("category2Code",  $params->category2Code);
-        $client->addPostParam("desc",  $params->desc);
-        $client->addPostParam("labelAttr",  $params->labelAttr);
-        $client->addPostParam("labelDiscount",  $params->labelDiscount);
-        $client->addPostParam("buttonName",  $params->buttonName);
-        $client->addPostParam("bigImage",  $params->bigImage);
-        $client->addPostParam("verticalImage",  $params->verticalImage);
-        $client->addPostParam("extJson",  $params->extJson);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addPostParam("app_id",  $params->appId, false);
+        $client->addPostParam("id",  $params->id, true);
+        $client->addPostParam("imageUrl",  $params->imageUrl, true);
+        $client->addPostParam("title",  $params->title, true);
+        $client->addPostParam("path",  $params->path, true);
+        $client->addPostParam("category1Code",  $params->category1Code, true);
+        $client->addPostParam("category2Code",  $params->category2Code, true);
+        $client->addPostParam("desc",  $params->desc, false);
+        $client->addPostParam("labelAttr",  $params->labelAttr, false);
+        $client->addPostParam("labelDiscount",  $params->labelDiscount, false);
+        $client->addPostParam("buttonName",  $params->buttonName, false);
+        $client->addPostParam("bigImage",  $params->bigImage, false);
+        $client->addPostParam("verticalImage",  $params->verticalImage, false);
+        $client->addPostParam("extJson",  $params->extJson, false);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -101,5 +83,9 @@ class ModifyMaterial{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

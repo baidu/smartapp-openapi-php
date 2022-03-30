@@ -4,7 +4,6 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class SubmitResourceRequest {
     public $accessToken; // string 接口调用凭证
     public $appId; // int64 app_id
@@ -18,21 +17,6 @@ class SubmitResourceRequest {
     public $path; // string 智能小程序落地页链接
     public $tags; // string 资源标签，英文逗号分割，填写越准确详细可能带来更好的分发效果（最多 10 个，总长度最多 100 字）
     public $title; // string 标题
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->appId = 0;
-        $this->body = "";
-        $this->ext = "";
-        $this->feedSubType = "";
-        $this->feedType = "";
-        $this->images = "";
-        $this->mappSubType = "";
-        $this->mappType = "";
-        $this->path = "";
-        $this->tags = "";
-        $this->title = "";
-    }
 }
 
 /**
@@ -41,6 +25,7 @@ class SubmitResourceRequest {
 class SubmitResource{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -52,37 +37,37 @@ class SubmitResource{
         $client->setPath("/rest/2.0/smartapp/access/submitresource");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addPostParam("app_id",  $params->appId);
-        $client->addPostParam("body",  $params->body);
-        $client->addPostParam("ext",  $params->ext);
-        $client->addPostParam("feed_sub_type",  $params->feedSubType);
-        $client->addPostParam("feed_type",  $params->feedType);
-        $client->addPostParam("images",  $params->images);
-        $client->addPostParam("mapp_sub_type",  $params->mappSubType);
-        $client->addPostParam("mapp_type",  $params->mappType);
-        $client->addPostParam("path",  $params->path);
-        $client->addPostParam("tags",  $params->tags);
-        $client->addPostParam("title",  $params->title);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addPostParam("app_id",  $params->appId, false);
+        $client->addPostParam("body",  $params->body, true);
+        $client->addPostParam("ext",  $params->ext, true);
+        $client->addPostParam("feed_sub_type",  $params->feedSubType, false);
+        $client->addPostParam("feed_type",  $params->feedType, true);
+        $client->addPostParam("images",  $params->images, true);
+        $client->addPostParam("mapp_sub_type",  $params->mappSubType, true);
+        $client->addPostParam("mapp_type",  $params->mappType, true);
+        $client->addPostParam("path",  $params->path, true);
+        $client->addPostParam("tags",  $params->tags, false);
+        $client->addPostParam("title",  $params->title, true);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -92,5 +77,9 @@ class SubmitResource{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

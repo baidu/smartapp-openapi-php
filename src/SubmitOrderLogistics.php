@@ -3,7 +3,6 @@ namespace BaiduSmartapp\OpenapiClient;
 use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
-
 // POST Json
 
 class SubmitOrderLogisticsRequestDataItemEXTMainOrderExpress {
@@ -12,30 +11,14 @@ class SubmitOrderLogisticsRequestDataItemEXTMainOrderExpress {
     public $Name; // string 快递公司名称
     public $Status; // int64 开发者默认传 0
     public $Type; // int64 快递类型，1：商家给用户发货，2：用户给商家退货；开发者根据快递类型传 1 或 2
-
-    function __construct() {
-        $this->Code = "";
-        $this->ID = "";
-        $this->Name = "";
-        $this->Status = 0;
-        $this->Type = 0;
-    }
 }
 
 class SubmitOrderLogisticsRequestDataItemEXTMainOrder {
     public $Express; // SubmitOrderLogisticsRequestDataItemEXTMainOrderExpress 快递信息
-
-    function __construct() {
-        $this->Express = new SubmitOrderLogisticsRequestDataItemEXTMainOrderExpress();
-    }
 }
 
 class SubmitOrderLogisticsRequestDataItemEXT {
     public $MainOrder; // SubmitOrderLogisticsRequestDataItemEXTMainOrder 主订单信息（购买商品订单）
-
-    function __construct() {
-        $this->MainOrder = new SubmitOrderLogisticsRequestDataItemEXTMainOrder();
-    }
 }
 
 class SubmitOrderLogisticsRequestDataItem {
@@ -43,13 +26,6 @@ class SubmitOrderLogisticsRequestDataItem {
     public $CateID; // int64 订单种类：1（实物）、2（虚拟物品）、5（快递服务类）、6（快递服务类无金额订单）、10（上门服务类）、11（上门服务类无金额订单）、15（酒店类）、20（票务类）、25（打车类）、26（打车类无金额订单）
     public $EXT; // SubmitOrderLogisticsRequestDataItemEXT 扩展信息
     public $ResourceID; // string 开发者接入的唯一订单 ID
-
-    function __construct() {
-        $this->BizAPPID = "";
-        $this->CateID = 0;
-        $this->EXT = new SubmitOrderLogisticsRequestDataItemEXT();
-        $this->ResourceID = "";
-    }
 }
 
 
@@ -61,15 +37,6 @@ class SubmitOrderLogisticsRequest {
     public $sceneType; // int64 支付场景类型，开发者请默认传 2 
     public $pmAppKey; // string 调起百度收银台的支付服务 appKey
     public $data; // array of SubmitOrderLogisticsRequestDataItem 请求数据
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->openId = "";
-        $this->sceneId = "";
-        $this->sceneType = 0;
-        $this->pmAppKey = "";
-        $this->data = array();
-    }
 }
 
 /**
@@ -78,6 +45,7 @@ class SubmitOrderLogisticsRequest {
 class SubmitOrderLogistics{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -89,34 +57,34 @@ class SubmitOrderLogistics{
         $client->setPath("/rest/2.0/smartapp/ordercenter/app/add/main/logistics");
         $client->setContentType("application/json");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addGetParam("open_id", $params->openId);
-        $client->addGetParam("scene_id", $params->sceneId);
-        $client->addGetParam("scene_type", $params->sceneType);
-        $client->addGetParam("pm_app_key", $params->pmAppKey);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addGetParam("open_id", $params->openId, true);
+        $client->addGetParam("scene_id", $params->sceneId, true);
+        $client->addGetParam("scene_type", $params->sceneType, false);
+        $client->addGetParam("pm_app_key", $params->pmAppKey, true);
         $postData = array(
             "Data" =>  $params->data,
         );
         $client->setPostData($postData);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -126,5 +94,9 @@ class SubmitOrderLogistics{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

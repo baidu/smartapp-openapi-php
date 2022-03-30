@@ -1,9 +1,10 @@
 <?php
 // 本示例基于百度智能小程序服务端开发者 OpenAPI-SDK-PHP
-// 使用该示例需要首先下载该 SDK，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
-// 使用之前请先确认下 SDK 版本是否为最新版本，如不是，请下载最新版本使用
+// 使用该示例需要利用 composer 包管理平台，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
 // 如使用过程中遇到问题，可以加入如流群：5702992，进行反馈咨询
-require_once __DIR__ . DIRECTORY_SEPARATOR . "bootstrap.php";
+
+// 使用 composer 上的 SDK 时的引入依赖命令
+require __DIR__ . DIRECTORY_SEPARATOR . "bootstrap.php";
 
 function main(){
     $obj = new BaiduSmartapp\OpenapiClient\UpdateOrderSubStatus();
@@ -22,27 +23,27 @@ function main(){
     $updateOrderSubStatusRequestDataItemEXTVal->SubsOrder = $updateOrderSubStatusRequestDataItemEXTSubsOrderVal; // 文档中对应字段：SubsOrder，实际使用时请替换成真实参数
     
     $updateOrderSubStatusRequestDataItemVal = new BaiduSmartapp\OpenapiClient\UpdateOrderSubStatusRequestDataItem();
-    $updateOrderSubStatusRequestDataItemVal->BizAPPID = "WXF4pGOvo0TTGU8qCMMhEjvFBkF3bO5Z"; // 文档中对应字段：BizAPPID，实际使用时请替换成真实参数
+    $updateOrderSubStatusRequestDataItemVal->BizAPPID = "WXF8pGOvo1TTGU1qCMMhEjvFBkF7bO1Z"; // 文档中对应字段：BizAPPID，实际使用时请替换成真实参数
     $updateOrderSubStatusRequestDataItemVal->CateID = 1; // 文档中对应字段：CateID，实际使用时请替换成真实参数
     $updateOrderSubStatusRequestDataItemVal->EXT = $updateOrderSubStatusRequestDataItemEXTVal; // 文档中对应字段：EXT，实际使用时请替换成真实参数
-    $updateOrderSubStatusRequestDataItemVal->ResourceID = "1222626628210"; // 文档中对应字段：ResourceID，实际使用时请替换成真实参数
+    $updateOrderSubStatusRequestDataItemVal->ResourceID = "1318173425381"; // 文档中对应字段：ResourceID，实际使用时请替换成真实参数
     
     $params = new BaiduSmartapp\OpenapiClient\UpdateOrderSubStatusRequest();
-    $params->accessToken = "26.511f63332a1074a3c3ad4c258746eb20.2275603.0141234158.130347-03602873"; // 文档中对应字段：access_token，实际使用时请替换成真实参数
-    $params->openId = "k72HEREQhWhWWB7WYqYT0ITUGX"; // 文档中对应字段：open_id，实际使用时请替换成真实参数
-    $params->sceneId = "1848884810315"; // 文档中对应字段：scene_id，实际使用时请替换成真实参数
+    $params->accessToken = "20.556f31405a4206a2c0ad5c765848eb51.1765580.3772616450.156134-38333125"; // 文档中对应字段：access_token，实际使用时请替换成真实参数
+    $params->openId = "k76HEREQhWhWWB6WYqYT1ITUGX"; // 文档中对应字段：open_id，实际使用时请替换成真实参数
+    $params->sceneId = "1441320804600"; // 文档中对应字段：scene_id，实际使用时请替换成真实参数
     $params->sceneType = 1; // 文档中对应字段：scene_type，实际使用时请替换成真实参数
-    $params->pmAppKey = "WXF0pGOvo6TTGU1qCMMhEjvFBkF1bO5Z"; // 文档中对应字段：pm_app_key，实际使用时请替换成真实参数
+    $params->pmAppKey = "WXF2pGOvo4TTGU2qCMMhEjvFBkF3bO0Z"; // 文档中对应字段：pm_app_key，实际使用时请替换成真实参数
 	$params->data = array($updateOrderSubStatusRequestDataItemVal,); // 文档中对应字段：Data，实际使用时请替换成真实参数
 
     if ($obj->doRequest($params)){
         // 如果请求成功 可以直接通过 getData 方法获取到返回结构体里的 data 字段值
         var_dump($obj->getData());
-        // 如果请求成功 可以通过 getErrMsg 方法获取到完整的响应信息
-        var_dump($obj->getErrMsg());
     } else {
         // 如果请求失败 可以直接通过 getErrMsg 方法获取到报错信息，辅助问题定位
         var_dump($obj->getErrMsg());
     }
+    // 请求成功或失败，都可以通过 getResponse 方法获取到原始响应信息
+    var_dump($obj->getResponse());
 }
 main();

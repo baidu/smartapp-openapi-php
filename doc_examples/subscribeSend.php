@@ -1,9 +1,10 @@
 <?php
 // 本示例基于百度智能小程序服务端开发者 OpenAPI-SDK-PHP
-// 使用该示例需要首先下载该 SDK，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
-// 使用之前请先确认下 SDK 版本是否为最新版本，如不是，请下载最新版本使用
+// 使用该示例需要利用 composer 包管理平台，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
 // 如使用过程中遇到问题，可以加入如流群：5702992，进行反馈咨询
-require_once __DIR__ . DIRECTORY_SEPARATOR . "bootstrap.php";
+
+// 使用 composer 上的 SDK 时的引入依赖命令
+require __DIR__ . DIRECTORY_SEPARATOR . "bootstrap.php";
 
 function main(){
     $obj = new BaiduSmartapp\OpenapiClient\SubscribeSend();
@@ -12,20 +13,20 @@ function main(){
 	// 如果开发者不想传非必需参数，可以将设置该参数的行注释
     $params = new BaiduSmartapp\OpenapiClient\SubscribeSendRequest();
     $params->accessToken = ""; // 文档中对应字段：access_token，实际使用时请替换成真实参数
-    $params->templateId = "84462b477e0171a3b6df63db564a7fb1"; // 文档中对应字段：template_id，实际使用时请替换成真实参数
-    $params->touserOpenId = "31GetTsw3nWRMVaYnlswLQ3t6y"; // 文档中对应字段：touser_openId，实际使用时请替换成真实参数
+    $params->templateId = "84432b588e4078a8b4df58db551a8fb7"; // 文档中对应字段：template_id，实际使用时请替换成真实参数
+    $params->touserOpenId = "37GetTsw4nWRMVaYnlswLQ0t5y"; // 文档中对应字段：touser_openId，实际使用时请替换成真实参数
     $params->subscribeId = "xxxxx"; // 文档中对应字段：subscribe_id，实际使用时请替换成真实参数
-    $params->data = "{\"keyword4\": {\"value\": \"0404-06-88\"},\"keyword5\": {\"value\": \"kfc\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
+    $params->data = "{\\"keyword1\\": {\\"value\\": \\"2314-45-03\\"},\\"keyword6\\": {\\"value\\": \\"kfc\\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
     $params->page = "index?foo=bar"; // 文档中对应字段：page，实际使用时请替换成真实参数
 
     if ($obj->doRequest($params)){
         // 如果请求成功 可以直接通过 getData 方法获取到返回结构体里的 data 字段值
         var_dump($obj->getData());
-        // 如果请求成功 可以通过 getErrMsg 方法获取到完整的响应信息
-        var_dump($obj->getErrMsg());
     } else {
         // 如果请求失败 可以直接通过 getErrMsg 方法获取到报错信息，辅助问题定位
         var_dump($obj->getErrMsg());
     }
+    // 请求成功或失败，都可以通过 getResponse 方法获取到原始响应信息
+    var_dump($obj->getResponse());
 }
 main();

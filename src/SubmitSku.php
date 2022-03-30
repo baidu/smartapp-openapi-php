@@ -3,7 +3,6 @@ namespace BaiduSmartapp\OpenapiClient;
 use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
-
 // POST Json
 
 class SubmitSkuRequestpriceInfo {
@@ -12,14 +11,6 @@ class SubmitSkuRequestpriceInfo {
     public $range_max_price; // string 当前服务的实际成交价格区间：最高价格
     public $range_min_price; // string 当前服务的实际成交价格区间：最低价格
     public $real_price; // string 当前服务的实际成交价格，精确价格与价格区间不同时出现
-
-    function __construct() {
-        $this->org_price = "";
-        $this->org_unit = "";
-        $this->range_max_price = "";
-        $this->range_min_price = "";
-        $this->real_price = "";
-    }
 }
 
 class SubmitSkuRequestactivityInfoItem {
@@ -28,19 +19,12 @@ class SubmitSkuRequestactivityInfoItem {
     public $activity_path; // string 优惠活动落地页链接，若优惠活动说明已填，则必填
     public $activity_start_time; // int64 优惠开始时间（时间戳到秒），最多可早于提交时间 180 个自然日；若优惠活动说明已填，则必填
     public $activity_type; // string 优惠活动类型，默认值为优惠;不得出现特殊符号；可选文案：领券、红包、补贴、限免、特价、赠品、会员、拼团；如需新增，发邮件至 smartapp-yylzd@baidu.com ，邮件正文请提供 APP key 、小程序名称、页面标题、描述、落地页 path 、新增活动类型
-
-    function __construct() {
-        $this->activity_desc = "";
-        $this->activity_end_time = 0;
-        $this->activity_path = "";
-        $this->activity_start_time = 0;
-        $this->activity_type = "";
-    }
 }
 
 class SubmitSkuRequestBody {
     public $activity_info; // array of SubmitSkuRequestactivityInfoItem 优惠活动，详见：activity_info 字段说明
     public $button_name; // string 服务按钮内的文案，表达使用服务的动作；字数为两个/四个汉字，推荐文案如下：咨询/立即咨询、问诊/立即问诊、预约/立即预约、预订/立即预订、办理/立即办理、购买/立即购买、购票/立即购票、抢票/立即抢票、订票/立即订票、下单/立即下单、抢购/立即抢购、团购/立即团购、入住/立即入住、查询/立即查询、查看/立即查看、排队/立即排队、进店/立即进店、租车/立即租车、租房/立即租房、充值/立即充值、缴费/立即缴费；如需新增，发邮件至 ext_service_category@baidu.com ，邮件正文请提供 APP key 、小程序名称、页面标题、描述、落地页 path 、新增按钮文案
+    public $channel; // string 折扣商品分发渠道，电商-折扣商品类目（2013）必填，每种渠道有对应的code值，填写多个渠道请以英文逗号分隔，可选的分发渠道：惠生活-200002、DU会员-200009
     public $desc; // string 服务简介，服务的文字解释说明，8~34 个字符(汉字占 2 字符)
     public $images; // array of string 封面图片链接，目前只须传 1 张图片 图片要求： 1.图片内容要求： 图片清晰、干净，不要出现令人不适的内容；不能出现严重影响用户理解的内容截断问题；图片无水印、二维码、logo； 2.相关性&一致性： 图片与标题、服务落地页内容相关、信息一致;单图片最大不能超 2M，只支持 JPG 或 PNG 格式 三种可选图片比例： a.正方形图片，比例 1:1，图片尺寸要求不低于 352 * 352 b.长方形横图，比例 16:9，图片尺寸不低于 1068 * 601 c.长方形竖图，比例 3:4，图片尺寸不低于 372 * 495
     public $path; // string 智能小程序落地页链接
@@ -50,20 +34,6 @@ class SubmitSkuRequestBody {
     public $tag; // string 服务的属性、亮点；最多三个标签；每个标签字数不超过 5 个汉字；不得出现特殊符号；“官方标”不可提交；多个标签使用英文封号分割
     public $title; // string 服务标题：描述服务是什么，12~30 个字符(汉字占 2 字符)
     public $trade_type; // int64 服务类目编码，参考附录一
-
-    function __construct() {
-        $this->activity_info = array();
-        $this->button_name = "";
-        $this->desc = "";
-        $this->images = array();
-        $this->path = "";
-        $this->price_info = new SubmitSkuRequestpriceInfo();
-        $this->region = "";
-        $this->schema = "";
-        $this->tag = "";
-        $this->title = "";
-        $this->trade_type = 0;
-    }
 }
 
 
@@ -71,11 +41,6 @@ class SubmitSkuRequestBody {
 class SubmitSkuRequest {
     public $accessToken; // string 接口调用凭证
     public $requestBody; // array of SubmitSkuRequestBody
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->requestBody = array();
-    }
 }
 
 /**
@@ -84,6 +49,7 @@ class SubmitSkuRequest {
 class SubmitSku{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -95,28 +61,28 @@ class SubmitSku{
         $client->setPath("/rest/2.0/smartapp/server/submit/sku");
         $client->setContentType("application/json");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
         $postData = $params->requestBody;
         $client->setPostData($postData);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -126,5 +92,9 @@ class SubmitSku{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

@@ -4,7 +4,6 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class DetectRiskRequest {
     public $accessToken; // string 接口调用凭证
     public $appkey; // string 小程序 appkey，智能小程序 AppKey
@@ -15,18 +14,6 @@ class DetectRiskRequest {
     public $ev; // string 事件类型，预先分配事件 ID 定义。1、点击活动按钮（或者活动操作），活动相关操作默认选择此事件；2、 进入活动页面；3、注册；4、登录；5、分享；6、点赞；7、评论；8、 提现；9、下单/提单；10、支付；11、业务自定义动作；12、浏览 feed；13、开宝箱；14、领取红包；15、分享 feed；16、做任务；17、签到；18、排行榜；19、邀请；20、新客红包；21、摇一摇；22、语音红包；23、视频红包；24、金融授信；25、答题
     public $useragent; // string 客户端请求小程序 Server 的 useragent，示例：Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36
     public $phone; // string 加密后的电话号码，加密方法：sha1
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->appkey = "";
-        $this->xtoken = "";
-        $this->type = "";
-        $this->clientip = "";
-        $this->ts = 0;
-        $this->ev = "";
-        $this->useragent = "";
-        $this->phone = "";
-    }
 }
 
 /**
@@ -35,6 +22,7 @@ class DetectRiskRequest {
 class DetectRisk{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -46,34 +34,34 @@ class DetectRisk{
         $client->setPath("/rest/2.0/smartapp/detectrisk");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addPostParam("appkey",  $params->appkey);
-        $client->addPostParam("xtoken",  $params->xtoken);
-        $client->addPostParam("type",  $params->type);
-        $client->addPostParam("clientip",  $params->clientip);
-        $client->addPostParam("ts",  $params->ts);
-        $client->addPostParam("ev",  $params->ev);
-        $client->addPostParam("useragent",  $params->useragent);
-        $client->addPostParam("phone",  $params->phone);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addPostParam("appkey",  $params->appkey, true);
+        $client->addPostParam("xtoken",  $params->xtoken, true);
+        $client->addPostParam("type",  $params->type, true);
+        $client->addPostParam("clientip",  $params->clientip, true);
+        $client->addPostParam("ts",  $params->ts, true);
+        $client->addPostParam("ev",  $params->ev, false);
+        $client->addPostParam("useragent",  $params->useragent, false);
+        $client->addPostParam("phone",  $params->phone, false);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -83,5 +71,9 @@ class DetectRisk{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

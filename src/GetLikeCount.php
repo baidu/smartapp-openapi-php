@@ -4,19 +4,11 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class GetLikeCountRequest {
     public $accessToken; // string 接口调用凭证
     public $hostName; // string 宿主名称
     public $snid; // string 文章的 ID
     public $snidType; // string 无 snid_type 的开发者请默认传空串
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->hostName = "";
-        $this->snid = "";
-        $this->snidType = "";
-    }
 }
 
 /**
@@ -25,6 +17,7 @@ class GetLikeCountRequest {
 class GetLikeCount{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -36,29 +29,29 @@ class GetLikeCount{
         $client->setPath("/rest/2.0/smartapp/oss/publisher/ugc/like_count");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addGetParam("host_name", $params->hostName);
-        $client->addPostParam("snid",  $params->snid);
-        $client->addPostParam("snid_type",  $params->snidType);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addGetParam("host_name", $params->hostName, false);
+        $client->addPostParam("snid",  $params->snid, true);
+        $client->addPostParam("snid_type",  $params->snidType, false);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -68,5 +61,9 @@ class GetLikeCount{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

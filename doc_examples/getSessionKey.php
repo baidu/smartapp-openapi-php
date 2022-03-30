@@ -1,8 +1,9 @@
 <?php
 // 本示例基于百度智能小程序服务端开发者 OpenAPI-SDK-PHP
-// 使用该示例需要首先下载该 SDK，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
-// 使用之前请先确认下 SDK 版本是否为最新版本，如不是，请下载最新版本使用
+// 使用该示例需要利用 composer 包管理平台，使用引导见：https://smartprogram.baidu.com/docs/develop/serverapi/introduction_for_openapi_sdk/
 // 如使用过程中遇到问题，可以加入如流群：5702992，进行反馈咨询
+
+// 使用 composer 上的 SDK 时的引入依赖命令
 require_once __DIR__ . DIRECTORY_SEPARATOR . "bootstrap.php";
 
 function main(){
@@ -11,18 +12,19 @@ function main(){
     // 注意：代码示例中的参数字段基本是驼峰形式，而文档中的参数说明的参数字段基本是下划线形式
 	// 如果开发者不想传非必需参数，可以将设置该参数的行注释
     $params = new BaiduSmartapp\OpenapiClient\GetSessionKeyRequest();
-    $params->code = "5b444bdb5c18805e57530d6a3ce8f138NW"; // 文档中对应字段：code，实际使用时请替换成真实参数
-    $params->clientId = "4fecoAqgCIUtzIyA3FAPgoyrc2oUc43c"; // 文档中对应字段：client_id，实际使用时请替换成真实参数
-    $params->sk = "rZ7BcWQPSQxS1jhCwSVVx2gfRdNWn7TO"; // 文档中对应字段：sk，实际使用时请替换成真实参数
+    
+    $params->code = "5b626bdb3c12227e15113d5a6ce6f110NW"; // 文档中对应字段：code，实际使用时请替换成真实参数
+    $params->clientId = "4fecoAqgCIUtzIyA3FAPgoyrc6oUc58c"; // 文档中对应字段：client_id，实际使用时请替换成真实参数
+    $params->sk = "rZ7BcWQPSQxS0jhCwSVVx2gfRdNWn1TO"; // 文档中对应字段：sk，实际使用时请替换成真实参数
 
     if ($obj->doRequest($params)){
         // 如果请求成功 可以直接通过 getData 方法获取到返回结构体里的 data 字段值
         var_dump($obj->getData());
-        // 如果请求成功 可以通过 getErrMsg 方法获取到完整的响应信息
-        var_dump($obj->getErrMsg());
     } else {
         // 如果请求失败 可以直接通过 getErrMsg 方法获取到报错信息，辅助问题定位
         var_dump($obj->getErrMsg());
     }
+    // 请求成功或失败，都可以通过 getResponse 方法获取到原始响应信息
+    var_dump($obj->getResponse());
 }
 main();
