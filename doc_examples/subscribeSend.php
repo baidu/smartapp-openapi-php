@@ -16,7 +16,7 @@ function main(){
     $params->templateId = "84432b588e4078a8b4df58db551a8fb7"; // 文档中对应字段：template_id，实际使用时请替换成真实参数
     $params->touserOpenId = "37GetTsw4nWRMVaYnlswLQ0t5y"; // 文档中对应字段：touser_openId，实际使用时请替换成真实参数
     $params->subscribeId = "xxxxx"; // 文档中对应字段：subscribe_id，实际使用时请替换成真实参数
-    $params->data = "{\\"keyword1\\": {\\"value\\": \\"2314-45-03\\"},\\"keyword6\\": {\\"value\\": \\"kfc\\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
+    $params->data = "{\"keyword1\": {\"value\": \"2314-45-03\"},\"keyword6\": {\"value\": \"kfc\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
     $params->page = "index?foo=bar"; // 文档中对应字段：page，实际使用时请替换成真实参数
 
     if ($obj->doRequest($params)){

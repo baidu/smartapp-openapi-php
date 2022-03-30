@@ -15,7 +15,7 @@ function main(){
     $params->accessToken = "20.83ccdb44bad657518debd1e10da5b5e3.0724323.5004340226.084337-74607885"; // 文档中对应字段：access_token，实际使用时请替换成真实参数
     $params->templateId = "07c2cb38c65058fdb160213b716867b1"; // 文档中对应字段：template_id，实际使用时请替换成真实参数
     $params->touserOpenId = "5qFQZgDLuMZsCYYnTc38d50wYb"; // 文档中对应字段：touser_openId，实际使用时请替换成真实参数
-    $params->data = "{\\"keyword1\\": {\\"value\\": \\"1411-41-77\\"},\\"keyword1\\": {\\"value\\": \\"kfc\\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
+    $params->data = "{\"keyword1\": {\"value\": \"1411-41-77\"},\"keyword1\": {\"value\": \"kfc\"}}"; // 文档中对应字段：data，实际使用时请替换成真实参数
     $params->page = "1"; // 文档中对应字段：page，实际使用时请替换成真实参数
     $params->sceneId = "13.57dbac4cee30fb072628867275865d63.124824.0822467275.6"; // 文档中对应字段：scene_id，实际使用时请替换成真实参数
     $params->sceneType = 1; // 文档中对应字段：scene_type，实际使用时请替换成真实参数

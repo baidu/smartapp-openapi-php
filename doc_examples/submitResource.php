@@ -15,10 +15,10 @@ function main(){
     $params->accessToken = "27.0fa781ebfa2c503dda3b3a760c83361e.6626324.6805682727.547683-14683317"; // 文档中对应字段：access_token，实际使用时请替换成真实参数
     $params->appId = 18372726; // 文档中对应字段：app_id，实际使用时请替换成真实参数
     $params->body = "黄油化开备用，黄油化开后加入糖霜，搅拌均匀，加入蛋清，继续打匀，加入切碎的蔓越莓，继续搅拌。蔓越莓放多少根据自己的喜..."; // 文档中对应字段：body，实际使用时请替换成真实参数
-    $params->ext = "{\\"publish_time\\": \\"2021年 11 月 1 日\\"}"; // 文档中对应字段：ext，实际使用时请替换成真实参数
+    $params->ext = "{\"publish_time\": \"2021年 11 月 1 日\"}"; // 文档中对应字段：ext，实际使用时请替换成真实参数
     $params->feedSubType = "明星八卦（可选有限集合）"; // 文档中对应字段：feed_sub_type，实际使用时请替换成真实参数
     $params->feedType = "娱乐（可选有限集合）"; // 文档中对应字段：feed_type，实际使用时请替换成真实参数
-    $params->images = "[\\"https://z6.ax5x.com/5382/51/60/IP1kw6.jpg\\"]"; // 文档中对应字段：images，实际使用时请替换成真实参数
+    $params->images = "[\"https://z6.ax5x.com/5382/51/60/IP1kw6.jpg\"]"; // 文档中对应字段：images，实际使用时请替换成真实参数
     $params->mappSubType = "1318"; // 文档中对应字段：mapp_sub_type，实际使用时请替换成真实参数
     $params->mappType = "1437"; // 文档中对应字段：mapp_type，实际使用时请替换成真实参数
     $params->path = "/pages/detail/detail?id=774652"; // 文档中对应字段：path，实际使用时请替换成真实参数
