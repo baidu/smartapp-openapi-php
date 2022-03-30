@@ -4,17 +4,10 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class GetTemplateListRequest {
     public $accessToken; // string 接口调用凭证
     public $offset; // int64 用于分页，表示从 offset 开始，默认值为 0
     public $count; // int64 用于分页，表示拉取 count 条记录，默认值为 0 ，最大为 20
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->offset = 0;
-        $this->count = 0;
-    }
 }
 
 /**
@@ -23,6 +16,7 @@ class GetTemplateListRequest {
 class GetTemplateList{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -34,28 +28,28 @@ class GetTemplateList{
         $client->setPath("/rest/2.0/smartapp/template/templatelist");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addGetParam("offset", $params->offset);
-        $client->addGetParam("count", $params->count);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addGetParam("offset", $params->offset, true);
+        $client->addGetParam("count", $params->count, true);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -65,5 +59,9 @@ class GetTemplateList{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

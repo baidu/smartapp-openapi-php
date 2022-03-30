@@ -3,7 +3,6 @@ namespace BaiduSmartapp\OpenapiClient;
 use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
-
 // POST Json
 
 class UpdateOrderStatusRequestDataItem {
@@ -11,13 +10,6 @@ class UpdateOrderStatusRequestDataItem {
     public $CateID; // int64 订单种类：1（实物）、2（虚拟物品）、5（快递服务类）、6（快递服务类无金额订单）、10（上门服务类）、11（上门服务类无金额订单）、15（酒店类）、20（票务类）、25（打车类）、26（打车类无金额订单）
     public $ResourceID; // string 开发者接入的唯一订单 ID
     public $Status; // int64 订单状态，其值根据CateID不同有不同的定义。CateID = 1 实物订单、CateID = 2 虚拟物品订单、CateID = 5 快递服务类订单、CateID = 6 快递服务类无金额订单、CateID = 10 上门服务类订单、CateID = 11 上门服务类无金额订单、CateID = 15 酒店类订单、CateID = 20 出行票务类订单、CateID = 25 打车类订单、CateID = 26 打车类无金额订单
-
-    function __construct() {
-        $this->BizAPPID = "";
-        $this->CateID = 0;
-        $this->ResourceID = "";
-        $this->Status = 0;
-    }
 }
 
 
@@ -29,15 +21,6 @@ class UpdateOrderStatusRequest {
     public $sceneType; // int64 支付场景类型，开发者请默认传 2 
     public $pmAppKey; // string 调起百度收银台的支付服务 appKey
     public $data; // array of UpdateOrderStatusRequestDataItem 请求数据
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->openId = "";
-        $this->sceneId = "";
-        $this->sceneType = 0;
-        $this->pmAppKey = "";
-        $this->data = array();
-    }
 }
 
 /**
@@ -46,6 +29,7 @@ class UpdateOrderStatusRequest {
 class UpdateOrderStatus{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -57,34 +41,34 @@ class UpdateOrderStatus{
         $client->setPath("/rest/2.0/smartapp/ordercenter/app/update/main/status");
         $client->setContentType("application/json");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addGetParam("open_id", $params->openId);
-        $client->addGetParam("scene_id", $params->sceneId);
-        $client->addGetParam("scene_type", $params->sceneType);
-        $client->addGetParam("pm_app_key", $params->pmAppKey);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addGetParam("open_id", $params->openId, true);
+        $client->addGetParam("scene_id", $params->sceneId, true);
+        $client->addGetParam("scene_type", $params->sceneType, true);
+        $client->addGetParam("pm_app_key", $params->pmAppKey, true);
         $postData = array(
             "Data" =>  $params->data,
         );
         $client->setPostData($postData);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -94,5 +78,9 @@ class UpdateOrderStatus{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

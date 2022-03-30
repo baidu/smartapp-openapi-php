@@ -4,15 +4,9 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class GetPathCheckResultByIDRequest {
     public $accessToken; // string 接口调用凭据
     public $retrieveId; // string 异步检测页面接口返回的唯一标识
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->retrieveId = "";
-    }
 }
 
 /**
@@ -21,6 +15,7 @@ class GetPathCheckResultByIDRequest {
 class GetPathCheckResultByID{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -32,27 +27,27 @@ class GetPathCheckResultByID{
         $client->setPath("/rest/2.0/smartapp/riskDetection/v2/getPathCheckResultByID");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addGetParam("retrieveId", $params->retrieveId);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addGetParam("retrieveId", $params->retrieveId, true);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -62,5 +57,9 @@ class GetPathCheckResultByID{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

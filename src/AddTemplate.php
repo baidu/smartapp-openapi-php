@@ -4,17 +4,10 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class AddTemplateRequest {
     public $accessToken; // string 接口调用凭证
     public $id; // string 模板标题 id
     public $keywordIdList; // string 模板关键词 id 列表，如[1,2,3]
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->id = "";
-        $this->keywordIdList = "";
-    }
 }
 
 /**
@@ -23,6 +16,7 @@ class AddTemplateRequest {
 class AddTemplate{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -34,28 +28,28 @@ class AddTemplate{
         $client->setPath("/rest/2.0/smartapp/template/templateadd");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addPostParam("id",  $params->id);
-        $client->addPostParam("keyword_id_list",  $params->keywordIdList);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addPostParam("id",  $params->id, true);
+        $client->addPostParam("keyword_id_list",  $params->keywordIdList, true);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -65,5 +59,9 @@ class AddTemplate{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

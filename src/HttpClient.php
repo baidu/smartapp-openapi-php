@@ -5,8 +5,8 @@ class HttpClient{
     private $ch;
     private $contentType;
     private $method;
-    private $getParam;
-    private $postParam;
+    private $getParam = array();
+    private $postParam = array();
     private $host;
     private $path;
     private $headers;
@@ -53,14 +53,28 @@ class HttpClient{
         return $this;
     }
 
-    public function addPostParam($key, $value){
-        $this->postParam[$key] = $value;
+    public function addPostParam($key, $value, $required){
+        if (isset($value)) {
+            $this->postParam[$key] = $value;
+        } else {
+            if ($required) {
+                throw new \InvalidArgumentException("post param '$key' is required");
+            }
+        }
         return $this;
     }
-    public function addGetParam($key, $value){
-        $this->getParam[$key] = $value;
+
+    public function addGetParam($key, $value, $required){
+        if (isset($value)) {
+            $this->getParam[$key] = $value;
+        } else {
+            if ($required) {
+                throw new \InvalidArgumentException("get param '$key' is required");
+            }
+        }
         return $this;
     }
+
     //setTimeoutMS 设置超时，单位毫秒从php 5.2.3版本开始支持
     public function setTimeoutMS($timeout){
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT_MS, $timeout);
@@ -74,7 +88,7 @@ class HttpClient{
     }
 
     //setPostData 设置 post 参数
-    //将参数$data url encode 之后设置到 postbody， content-type 人 
+    //将参数$data url encode 之后设置到 postbody， content-type 人
     public function setPostData($data){
         $this->postParam = $data;
         return $this;
@@ -127,7 +141,7 @@ class HttpClient{
     }
 
     function __destruct(){
-        curl_close($this->ch);     
+        curl_close($this->ch);
     }
 
     function curl_multipart_postfields($ch, $params = array()) {
@@ -139,7 +153,7 @@ class HttpClient{
                     $files[$k] = $v->name;
                     continue;
                 }
-            } 
+            }
             $assoc[$k] = $v;
         }
         $this->curl_custom_postfields($ch, $assoc, $files);
@@ -156,14 +170,14 @@ class HttpClient{
                 filter_var($v),
             ));
         }
-       
+
         // build file parameters
         foreach ($files as $k => $v) {
             switch (true) {
                 case false === $v = realpath(filter_var($v)):
                 case !is_file($v):
                 case !is_readable($v):
-                    continue; // or return false, throw new InvalidArgumentException
+                    break; // or return false, throw new InvalidArgumentException
             }
             $data = file_get_contents($v);
             //$v = call_user_func("end", explode(DIRECTORY_SEPARATOR, $v));
@@ -177,21 +191,21 @@ class HttpClient{
                 $data,
             ));
         }
-       
+
         // generate safe boundary
         do {
             $boundary = "---------------------" . md5(mt_rand() . microtime());
         } while (preg_grep("/{$boundary}/", $body));
-       
+
         // add boundary for each parameters
         array_walk($body, function (&$part) use ($boundary) {
             $part = "--{$boundary}\r\n{$part}";
         });
-       
+
         // add final boundary
         $body[] = "--{$boundary}--";
         $body[] = "";
-       
+
         // set options
         return @curl_setopt_array($ch, array(
             CURLOPT_POST       => true,
@@ -201,5 +215,5 @@ class HttpClient{
                 "Content-Type: multipart/form-data; boundary={$boundary}", // change Content-Type
             ),
         ));
-    }    
+    }
 }

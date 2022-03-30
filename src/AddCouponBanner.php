@@ -4,21 +4,12 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class AddCouponBannerRequest {
     public $accessToken; // string 接口调用凭证
-    public $title; // string 卡券 banner 图标题
     public $appRedirectPath; // string banner 图跳转的小程序页面路径
     public $couponId; // string 卡券 ID
     public $picUrl; // string 卡券 banner 图片
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->title = "";
-        $this->appRedirectPath = "";
-        $this->couponId = "";
-        $this->picUrl = "";
-    }
+    public $title; // string 卡券 banner 图标题
 }
 
 /**
@@ -27,6 +18,7 @@ class AddCouponBannerRequest {
 class AddCouponBanner{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -38,33 +30,33 @@ class AddCouponBanner{
         $client->setPath("/rest/2.0/smartapp/v1.0/coupon/banner/add");
         $client->setContentType("application/json");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
         $postData = array(
-            "title" =>  $params->title,
             "appRedirectPath" =>  $params->appRedirectPath,
             "couponId" =>  $params->couponId,
             "picUrl" =>  $params->picUrl,
+            "title" =>  $params->title,
         );
         $client->setPostData($postData);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -74,5 +66,9 @@ class AddCouponBanner{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

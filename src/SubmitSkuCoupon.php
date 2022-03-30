@@ -3,17 +3,11 @@ namespace BaiduSmartapp\OpenapiClient;
 use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
-
 // POST Json
 
 class SubmitSkuCouponRequestpriceInfo {
     public $org_price; // string 付费优惠券：优惠活动前的服务原价格，注意，是以分为单位
     public $real_price; // string 付费优惠券：当前服务的实际成交价格，注意，是以分为单位
-
-    function __construct() {
-        $this->org_price = "";
-        $this->real_price = "";
-    }
 }
 
 class SubmitSkuCouponRequestBody {
@@ -25,17 +19,6 @@ class SubmitSkuCouponRequestBody {
     public $schema; // string 优惠券的具体信息，详见：coupon_info
     public $title; // string 优惠券标题：活动优惠信息说明，12-30 个字符(汉字占 2 字符)；不允许有特殊符号；优惠活动信息必须真实；需要清晰地说明商品内容，说明券的品牌（如肯德基、爱奇艺）、优惠主体（如 30 元代金券、汉堡薯条炸鸡兑换券）
     public $trade_type; // int64 服务类目编码，参考附录一
-
-    function __construct() {
-        $this->desc = "";
-        $this->images = array();
-        $this->path = "";
-        $this->price_info = new SubmitSkuCouponRequestpriceInfo();
-        $this->region = "";
-        $this->schema = "";
-        $this->title = "";
-        $this->trade_type = 0;
-    }
 }
 
 
@@ -43,11 +26,6 @@ class SubmitSkuCouponRequestBody {
 class SubmitSkuCouponRequest {
     public $accessToken; // string 接口调用凭证
     public $requestBody; // array of SubmitSkuCouponRequestBody
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->requestBody = array();
-    }
 }
 
 /**
@@ -56,6 +34,7 @@ class SubmitSkuCouponRequest {
 class SubmitSkuCoupon{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -67,28 +46,28 @@ class SubmitSkuCoupon{
         $client->setPath("/rest/2.0/smartapp/server/submit/skuCoupon");
         $client->setContentType("application/json");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
         $postData = $params->requestBody;
         $client->setPostData($postData);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -98,5 +77,9 @@ class SubmitSkuCoupon{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }

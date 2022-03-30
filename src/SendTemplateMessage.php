@@ -4,7 +4,6 @@ use BaiduSmartapp\OpenapiClient\HttpClient;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "base.php";
 
 
-
 class SendTemplateMessageRequest {
     public $accessToken; // string 接口调用凭证
     public $templateId; // string 小程序模板 ID
@@ -13,16 +12,6 @@ class SendTemplateMessageRequest {
     public $page; // string 点击模板卡片后的跳转页面，仅限本小程序内的页面。支持带参数，（示例 index?foo=bar），该字段不填默认跳转至首页
     public $sceneId; // string 场景 id ，例如 formId、orderId、payId。formId 为页面内 form 组件的report-submit属性为 true 时返回 formId ，详见 form 表单
     public $sceneType; // int64 场景 type 。1：表单；2：百度收银台订单；3：直连订单
-
-    function __construct() {
-        $this->accessToken = "";
-        $this->templateId = "";
-        $this->touserOpenId = "";
-        $this->data = "";
-        $this->page = "";
-        $this->sceneId = "";
-        $this->sceneType = 0;
-    }
 }
 
 /**
@@ -31,6 +20,7 @@ class SendTemplateMessageRequest {
 class SendTemplateMessage{
     private $data;
     private $errMsg;
+    private $response;
 
     /**
      * @return bool true 请求成功, 调用 getData 获取返回值；false 请求失败 调用 getErrMsg 获取错误详情；
@@ -42,32 +32,32 @@ class SendTemplateMessage{
         $client->setPath("/rest/2.0/smartapp/template/send");
         $client->setContentType("application/x-www-form-urlencoded");
 
-        $client->addGetParam("sp_sdk_lang", SDKLANG);
-        $client->addGetParam("sp_sdk_ver", SDKVERSION);
-        $client->addGetParam("access_token", $params->accessToken);
-        $client->addPostParam("template_id",  $params->templateId);
-        $client->addPostParam("touser_openId",  $params->touserOpenId);
-        $client->addPostParam("data",  $params->data);
-        $client->addPostParam("page",  $params->page);
-        $client->addPostParam("scene_id",  $params->sceneId);
-        $client->addPostParam("scene_type",  $params->sceneType);
+        $client->addGetParam("sp_sdk_lang", SDKLANG, true);
+        $client->addGetParam("sp_sdk_ver", SDKVERSION, true);
+        $client->addGetParam("access_token", $params->accessToken, true);
+        $client->addPostParam("template_id",  $params->templateId, true);
+        $client->addPostParam("touser_openId",  $params->touserOpenId, true);
+        $client->addPostParam("data",  $params->data, true);
+        $client->addPostParam("page",  $params->page, false);
+        $client->addPostParam("scene_id",  $params->sceneId, true);
+        $client->addPostParam("scene_type",  $params->sceneType, true);
 
-        $res = $client->execute();
-        if ($res['status_code'] < 200 || $res['status_code'] >=300) {
-            $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->response = $client->execute();
+        if ($this->response['status_code'] < 200 || $this->response['status_code'] >=300) {
+            $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
             return false;
         }
-        if ($res['body'] != false){
-            $resBody = json_decode($res['body'], true);
+        if ($this->response['body'] != false){
+            $resBody = json_decode($this->response['body'], true);
             if (isset($resBody['errno']) && $resBody['errno'] === 0) {
-                $this->data = $resBody['data'];
-                $this->errMsg = sprintf("error response [%s]", $res['body']);
+                isset($resBody['data']) && $this->data = $resBody['data'];
+                $this->errMsg = sprintf("error response [%s]", $this->response['body']);
                 return true;
             }
-            $this->errMsg = sprintf("error response [%s]", $res['body']);
+            $this->errMsg = sprintf("error response [%s]", $this->response['body']);
             return false;
         }
-        $this->errMsg = sprintf("error response body [%s]", json_encode($res));
+        $this->errMsg = sprintf("error response body [%s]", json_encode($this->response));
         return false;
     }
 
@@ -77,5 +67,9 @@ class SendTemplateMessage{
 
     public function getData(){
         return $this->data;
+    }
+
+    public function getResponse() {
+        return $this->response;
     }
 }
