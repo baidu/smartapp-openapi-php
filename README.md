@@ -14,7 +14,7 @@
    ```json
    {
     "require": {
-        "baidu-smartapp/openapi": "0.1.3"
+        "baidu-smartapp/openapi": "0.1.4"
     }
    }
    ```
