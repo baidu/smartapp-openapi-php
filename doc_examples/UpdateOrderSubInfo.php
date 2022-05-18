@@ -17,7 +17,7 @@ function main(){
     $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundProductItemVal->Quantity = 1; // 文档中对应字段：Quantity，实际使用时请替换成真实参数
     
     $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundVal = new BaiduSmartapp\OpenapiClient\UpdateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefund();
-    $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundVal->Amount = "1781"; // 文档中对应字段：Amount，实际使用时请替换成真实参数
+    $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundVal->Amount = 1781; // 文档中对应字段：Amount，实际使用时请替换成真实参数
     $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundVal->Product = array($updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundProductItemVal,); // 文档中对应字段：Product，实际使用时请替换成真实参数
     
     $updateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemOrderDetailVal = new BaiduSmartapp\OpenapiClient\UpdateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemOrderDetail();

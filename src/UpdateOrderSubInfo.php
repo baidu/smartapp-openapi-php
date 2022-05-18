@@ -12,7 +12,7 @@ class UpdateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundProductItem {
 }
 
 class UpdateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefund {
-    public $Amount; // string 退款总金额（单位：分），即100为1元。
+    public $Amount; // int64 退款总金额（单位：分），即100为1元。
     public $Product; // array of UpdateOrderSubInfoRequestDataItemEXTSubsOrderItemsItemRefundProductItem 售后商品列表
 }
 
